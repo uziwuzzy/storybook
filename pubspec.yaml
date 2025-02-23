@@ -1,0 +1,32 @@
+name: storybook
+description: "a children book powered by AI"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.5
+  flutter_secure_storage: ^9.0.0
+  flutter_svg: ^2.0.9
+  page_transition: ^2.1.0
+  audioplayers: ^5.2.1  # For page-turn sound effects (optional for now)
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/images/
+  fonts:
+    - family: Baloo
+      fonts:
+        - asset: fonts/Baloo-Regular.ttf
+    - family: Nunito
+      fonts:
+        - asset: fonts/Nunito-Regular.ttf
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
