@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:storybook/models/book_reader.dart';
 import 'package:storybook/controllers/book_reader_controller.dart';
-import 'package:storybook/routes/app_routes.dart';
 import 'package:storybook/config/app_colors.dart';
 
 class BookPageWidget extends StatelessWidget {
@@ -40,33 +39,61 @@ class BookPageWidget extends StatelessWidget {
         else
           _buildImagePlaceholder(),
 
-        // Text overlay at the bottom
+        // Text and navigation row at the bottom
         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            child: Text(
-              page.content,
-              style: const TextStyle(
-                fontFamily: 'Nunito',
-                fontSize: 22,
-                height: 1.5,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
+            color: Colors.black.withOpacity(0.5),
+            child: Row(
+              children: [
+                // Left navigation arrow
+                Container(
+                  width: 60,
+                  child: IconButton(
+                    iconSize: 40,
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                    ),
+                    onPressed: currentPage > 1 ? controller.previousPage : null,
+                  ),
+                ),
+
+                // Text content
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                    child: Text(
+                      page.content,
+                      style: const TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 22,
+                        height: 1.5,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+
+                // Right navigation arrow
+                Container(
+                  width: 60,
+                  child: IconButton(
+                    iconSize: 40,
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                    ),
+                    onPressed: controller.nextPage,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-
-        // Removed page indicators as they're now in the BookHeader
 
         // Audio controls at the top (only for listening mode)
         if (isListening)
@@ -162,46 +189,6 @@ class BookPageWidget extends StatelessWidget {
               ),
             ),
           ),
-
-        // Home and Music buttons removed as they're now in the BookHeader
-
-        // Navigation arrows aligned with the text area
-        Positioned(
-          left: 0,
-          bottom: 85, // Aligned with the text area
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              iconSize: 40,
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              ),
-              onPressed: currentPage > 1 ? controller.previousPage : null,
-            ),
-          ),
-        ),
-        Positioned(
-          right: 0,
-          bottom: 85, // Aligned with the text area
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              iconSize: 40,
-              icon: const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.white,
-              ),
-              onPressed: currentPage < totalPages ? controller.nextPage : null,
-            ),
-          ),
-        ),
       ],
     );
   }

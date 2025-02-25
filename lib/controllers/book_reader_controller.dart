@@ -2,11 +2,13 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:storybook/models/book_reader.dart';
+import 'package:storybook/widgets/book_ending/book_ending_overlay.dart';
 
 class BookReaderController extends GetxController {
   // Page control
   final RxInt currentPage = 0.obs;
   final PageController pageController = PageController();
+  final RxBool showEndingOverlay = false.obs;
 
   // Audio control
   final AudioPlayer audioPlayer = AudioPlayer(); // For voice narration
@@ -23,6 +25,11 @@ class BookReaderController extends GetxController {
 
   // UI control
   final RxBool showThumbnails = false.obs;
+
+  // Book metadata for credits
+  final String authorName = 'ALTAI ZEINALOV';
+  final String illustratorName = 'ANNA GORLACH';
+  final String composerName = 'ARTEM AKMULIN';
 
   // Sample pages for the book
   final List<BookPage> pages = [
@@ -149,33 +156,70 @@ class BookReaderController extends GetxController {
   }
 
   void nextPage() {
+    print('nextPage called. Current page: ${currentPage.value}, Total pages: ${pages.length}');
+
     if (currentPage.value < pages.length - 1) {
-      // First update the page value to ensure it moves only one page
+      // Move to next page
       int nextPageIndex = currentPage.value + 1;
       currentPage.value = nextPageIndex;
 
-      // Then animate to that specific page
+      // Animate to that page
       pageController.animateToPage(
         nextPageIndex,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
+    } else {
+      // We're at the last page, show ending
+      print('Showing ending overlay');
+      _showEndingOverlay();
     }
   }
 
   void previousPage() {
     if (currentPage.value > 0) {
-      // First update the page value to ensure it moves only one page
       int prevPageIndex = currentPage.value - 1;
       currentPage.value = prevPageIndex;
 
-      // Then animate to that specific page
       pageController.animateToPage(
         prevPageIndex,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  void _showEndingOverlay() {
+    // Dim background music
+    double originalVolume = musicVolume.value;
+    musicVolume.value = originalVolume * 0.5;
+
+    // Show the ending overlay
+    Get.dialog(
+      Material(
+        type: MaterialType.transparency,
+        child: BookEndingOverlay(
+          authorName: authorName,
+          illustratorName: illustratorName,
+          composerName: composerName,
+          onRestartBook: restartBook,
+        ),
+      ),
+      barrierDismissible: false,
+    ).then((_) {
+      // Restore music volume when dialog is closed
+      musicVolume.value = originalVolume;
+    });
+  }
+
+  void restartBook() {
+    // Reset to the first page
+    currentPage.value = 0;
+    pageController.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   void togglePlayPause() {
