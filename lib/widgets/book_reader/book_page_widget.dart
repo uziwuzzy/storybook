@@ -66,34 +66,7 @@ class BookPageWidget extends StatelessWidget {
           ),
         ),
 
-        // Page indicators (current/total as shown in the image)
-        Positioned(
-          top: 20,
-          left: 20,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              '$currentPage/$totalPages',
-              style: const TextStyle(
-                fontFamily: 'Baloo',
-                fontSize: 16,
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
+        // Removed page indicators as they're now in the BookHeader
 
         // Audio controls at the top (only for listening mode)
         if (isListening)
@@ -190,54 +163,7 @@ class BookPageWidget extends StatelessWidget {
             ),
           ),
 
-        // Home button (top left)
-        Positioned(
-          top: 20,
-          left: 20,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.home, color: Colors.blue),
-              onPressed: () => Get.offNamed(AppRoutes.HOME),
-            ),
-          ),
-        ),
-
-        // Music button (top right)
-        Positioned(
-          top: 20,
-          right: 20,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Obx(() => IconButton(
-              icon: Icon(
-                controller.isMusicPlaying.value ? Icons.music_note : Icons.music_off,
-                color: controller.isMusicPlaying.value ? Colors.blue : Colors.grey,
-              ),
-              onPressed: controller.toggleBackgroundMusic,
-            )),
-          ),
-        ),
+        // Home and Music buttons removed as they're now in the BookHeader
 
         // Navigation arrows aligned with the text area
         Positioned(

@@ -150,8 +150,13 @@ class BookReaderController extends GetxController {
 
   void nextPage() {
     if (currentPage.value < pages.length - 1) {
+      // First update the page value to ensure it moves only one page
+      int nextPageIndex = currentPage.value + 1;
+      currentPage.value = nextPageIndex;
+
+      // Then animate to that specific page
       pageController.animateToPage(
-        currentPage.value + 1,
+        nextPageIndex,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
@@ -160,8 +165,13 @@ class BookReaderController extends GetxController {
 
   void previousPage() {
     if (currentPage.value > 0) {
+      // First update the page value to ensure it moves only one page
+      int prevPageIndex = currentPage.value - 1;
+      currentPage.value = prevPageIndex;
+
+      // Then animate to that specific page
       pageController.animateToPage(
-        currentPage.value - 1,
+        prevPageIndex,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );

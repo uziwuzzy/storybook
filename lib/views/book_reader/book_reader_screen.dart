@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:storybook/controllers/book_reader_controller.dart';
 import 'package:storybook/widgets/book_reader/thumbnails_grid.dart';
 import 'package:storybook/widgets/book_reader/book_page_widget.dart';
+import 'package:storybook/widgets/book_reader/book_header.dart';
 
 class BookReaderScreen extends StatelessWidget {
   BookReaderScreen({Key? key}) : super(key: key);
@@ -22,23 +23,38 @@ class BookReaderScreen extends StatelessWidget {
     _initializeMode(controller, isListening, isRecording, narratorName);
 
     return Scaffold(
-      body: Obx(() {
-        // Show either the thumbnails grid or the book page view
-        if (controller.showThumbnails.value) {
-          return ThumbnailsGrid();
-        } else {
-          return PageView.builder(
-            controller: controller.pageController,
-            itemCount: controller.totalPages,
-            onPageChanged: (index) => controller.updatePage(index),
-            itemBuilder: (context, index) => BookPageWidget(
-              page: controller.pages[index],
-              isListening: isListening,
-              isRecording: isRecording && controller.isRecording.value,
+      body: Stack(
+        children: [
+          Obx(() {
+            // Show either the thumbnails grid or the book page view
+            if (controller.showThumbnails.value) {
+              return ThumbnailsGrid();
+            } else {
+              return PageView.builder(
+                controller: controller.pageController,
+                itemCount: controller.totalPages,
+                onPageChanged: (index) => controller.updatePage(index),
+                physics: const ClampingScrollPhysics(), // Prevent multi-page scrolling
+                itemBuilder: (context, index) => BookPageWidget(
+                  page: controller.pages[index],
+                  isListening: isListening,
+                  isRecording: isRecording && controller.isRecording.value,
+                ),
+              );
+            }
+          }),
+
+          // Add header at the top with home, page count/thumbnails toggle, and music buttons
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: controller.showThumbnails.value ? SizedBox() : BookHeader(),
             ),
-          );
-        }
-      }),
+          ),
+        ],
+      ),
     );
   }
 

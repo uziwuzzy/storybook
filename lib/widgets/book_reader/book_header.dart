@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:storybook/controllers/book_reader_controller.dart';
 import 'package:storybook/config/app_colors.dart';
+import 'package:storybook/routes/app_routes.dart';
 
 class BookHeader extends StatelessWidget {
   final BookReaderController controller = Get.find<BookReaderController>();
@@ -18,7 +19,7 @@ class BookHeader extends StatelessWidget {
           // Back button with nicer styling
           _buildCircleButton(
             icon: Icons.arrow_back,
-            onPressed: () => Get.back(),
+            onPressed: () => Get.offNamed(AppRoutes.HOME),
             color: AppColors.primary,
           ),
 
