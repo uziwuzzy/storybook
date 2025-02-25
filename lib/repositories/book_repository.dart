@@ -1,4 +1,4 @@
-import 'package:storybook/models/book_model.dart';
+import 'package:storybook/models/book.dart';
 
 class BookRepository {
   // Methods to fetch books, save reading progress, etc.

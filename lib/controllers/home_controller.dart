@@ -1,21 +1,7 @@
 import 'package:get/get.dart';
 import 'package:storybook/Services/auth_service.dart';
+import 'package:storybook/models/book.dart';
 
-class Book {
-  final String title;
-  final String author;
-  final String thumbnailUrl;
-  final String category;
-  final bool isPremium;
-
-  Book({
-    required this.title,
-    required this.author,
-    required this.thumbnailUrl,
-    required this.category,
-    this.isPremium = false,
-  });
-}
 
 class HomeController extends GetxController {
   RxList<Book> books = <Book>[].obs;

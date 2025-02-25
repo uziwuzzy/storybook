@@ -1,7 +1,7 @@
 class Book {
   final String title;
   final String author;
-  final String thumbnailUrl; // Updated to placehold.co
+  final String thumbnailUrl;
   final String category;
   final bool isPremium;
 
