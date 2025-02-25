@@ -26,9 +26,11 @@ class SubscriptionOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
+          // Main container
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(16, isPopular ? 24 : 16, 16, 16),
             decoration: BoxDecoration(
               color: isPopular ? Colors.amber.withOpacity(0.9) : Colors.white.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),
@@ -118,23 +120,33 @@ class SubscriptionOption extends StatelessWidget {
           // Most popular badge
           if (isPopular)
             Positioned(
-              top: -10,
+              top: -15,
               left: 0,
               right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.shade800,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    "BEST VALUE",
-                    style: TextStyle(
-                      fontFamily: 'Baloo',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              child: Container(
+                height: 30,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade800,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      "BEST VALUE",
+                      style: TextStyle(
+                        fontFamily: 'Baloo',
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:storybook/controllers/home_controller.dart';
 import 'package:storybook/config/app_colors.dart';
-import 'package:storybook/widgets/dialogs/premium_book_dialog.dart';
 import 'package:storybook/widgets/dialogs/premium_paywall_dialog.dart';
 import 'package:storybook/widgets/dialogs/settings_dialog.dart';
 import 'package:storybook/widgets/home/filter_section_tab.dart';
@@ -26,7 +25,7 @@ class HomeScreen extends StatelessWidget {
           // Background image with overlay
           Positioned.fill(
             child: Image.asset(
-              'assets/images/home_background.png', // Add this image to your assets
+              'assets/images/home_background.png',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 // Fallback gradient if image is missing
@@ -202,7 +201,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Filter section tabs
-          Row(
+          Obx(() => Row(
             children: [
               FilterSectionTab(
                 label: 'Category',
@@ -220,7 +219,7 @@ class HomeScreen extends StatelessWidget {
                 onTap: () => _activeFilterSection.value = 'Values',
               ),
             ],
-          ),
+          )),
 
           const SizedBox(height: 12),
 
@@ -315,7 +314,8 @@ class HomeScreen extends StatelessWidget {
               book: book,
               onTap: () {
                 if (book.isPremium) {
-                  PremiumBookDialog.show(book);
+                  // Show Paywall directly instead of the premium book dialog
+                  PremiumPaywallDialog.show();
                 } else {
                   UiUtils.navigateToBookIntro(book);
                 }
@@ -333,7 +333,7 @@ class HomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            'assets/images/gambar1.png', // Use an existing image or add a new one
+            'assets/images/gambar1.png',
             width: 150,
             height: 150,
             fit: BoxFit.contain,

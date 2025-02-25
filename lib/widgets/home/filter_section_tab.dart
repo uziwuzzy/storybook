@@ -17,7 +17,8 @@ class FilterSectionTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
@@ -27,6 +28,15 @@ class FilterSectionTab extends StatelessWidget {
             color: isSelected ? Colors.transparent : AppColors.primary,
             width: 1,
           ),
+          boxShadow: isSelected
+              ? [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ]
+              : null,
         ),
         child: Text(
           label,
