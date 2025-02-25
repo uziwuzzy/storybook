@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:storybook/Controller/HomeController.dart';
+import 'package:storybook/Views/BookIntroScreen.dart';
 import 'package:storybook/Views/BookReaderScreen.dart';
-import 'package:page_transition/page_transition.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController _controller = Get.put(HomeController());
@@ -165,7 +165,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Separated BookCard widget for better organization
 class BookCard extends StatelessWidget {
   final Book book;
 
@@ -177,12 +176,13 @@ class BookCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        PageTransition(
-          type: PageTransitionType.rightToLeftWithFade,
-          child: BookReaderScreen(),
+      onTap: () => Get.to(
+            () => BookIntroScreen(
+          bookTitle: book.title,
+          bookCoverUrl: book.thumbnailUrl,
         ),
+        transition: Transition.rightToLeft,
+        duration: const Duration(milliseconds: 300),
       ),
       child: Container(
         decoration: BoxDecoration(

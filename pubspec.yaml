@@ -12,8 +12,8 @@ dependencies:
   get: ^4.6.5
   flutter_secure_storage: ^9.0.0
   flutter_svg: ^2.0.9
-  page_transition: ^2.1.0
-  audioplayers: ^5.2.1  # For page-turn sound effects (optional for now)
+  # turn_page_transition: ^0.4.0  # Commented out as we're not using it
+  audioplayers: ^5.2.1  # For page-turn sound effects and audio playback
 
 flutter:
   uses-material-design: true
