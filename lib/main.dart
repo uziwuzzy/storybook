@@ -1,33 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:storybook/Services/AuthService.dart';
-import 'package:storybook/Views/HomeScreen.dart';
-import 'package:storybook/Views/LoginScreen.dart';
-import 'package:storybook/Views/ForgotPasswordScreen.dart';
-import 'package:storybook/Views/BookIntroScreen.dart'; // New import
-import 'package:storybook/Views/BookReaderScreen.dart'; // New import
+import 'package:storybook/routes/app_pages.dart';
+import 'package:storybook/routes/app_routes.dart';
+import 'package:storybook/services/auth_service.dart';
+import 'package:storybook/config/app_theme.dart';
 
 void main() {
-  runApp(MyApp());
-}
+  // Initialize services
+  Get.put(AuthService());
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    Get.put(AuthService()); // Register AuthService globally
-    return GetMaterialApp(
-      title: 'Children’s Book App',
-      initialRoute: '/home',
-      getPages: [
-        GetPage(name: '/login', page: () => LoginScreen()),
-        GetPage(name: '/home', page: () => HomeScreen()),
-        GetPage(name: '/forgot-password', page: () => ForgotPasswordScreen()),
-        GetPage(name: '/book-reader', page: () => BookReaderScreen()),
-      ],
-      theme: ThemeData(
-        fontFamily: 'Baloo',
-        primarySwatch: Colors.blue,
-      ),
-    );
-  }
+  runApp(
+    GetMaterialApp(
+      title: "Children's Book App",
+      initialRoute: AppRoutes.HOME,
+      getPages: AppPages.routes,
+      theme: AppTheme.lightTheme,
+      defaultTransition: Transition.fade,
+    ),
+  );
 }

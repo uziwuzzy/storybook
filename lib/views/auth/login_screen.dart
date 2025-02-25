@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:storybook/Controller/AuthController.dart';
+import 'package:storybook/controllers/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthController _controller = Get.put(AuthController());

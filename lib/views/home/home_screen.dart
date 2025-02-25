@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:storybook/Controller/HomeController.dart';
-import 'package:storybook/Views/BookIntroScreen.dart';
-import 'package:storybook/Views/BookReaderScreen.dart';
+import 'package:storybook/Views/book_intro/book_intro_screen.dart';
+import 'package:storybook/controllers/home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController _controller = Get.put(HomeController());

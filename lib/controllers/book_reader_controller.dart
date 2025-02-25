@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:storybook/Model/BookReader.dart';
+import 'package:storybook/models/book_reader.dart';
 
 class BookReaderController extends GetxController {
   // Page control
@@ -9,12 +9,17 @@ class BookReaderController extends GetxController {
   final PageController pageController = PageController();
 
   // Audio control
-  final AudioPlayer audioPlayer = AudioPlayer();
+  final AudioPlayer audioPlayer = AudioPlayer(); // For voice narration
+  final AudioPlayer backgroundMusicPlayer = AudioPlayer(); // For background music
   final RxBool isPlaying = false.obs;
   final RxBool isRecording = false.obs;
   final RxString currentNarrator = ''.obs;
   final RxDouble recordingProgress = 0.0.obs;
-  final RxString recordingTime = '00:0'.obs;
+  final RxString recordingTime = '00:00'.obs;
+
+  // Background music control
+  final RxBool isMusicPlaying = true.obs;
+  final RxDouble musicVolume = 0.3.obs; // Default volume for background music
 
   // UI control
   final RxBool showThumbnails = false.obs;
@@ -31,49 +36,52 @@ class BookReaderController extends GetxController {
     ),
     BookPage(
       content: 'Whiskers was an extraordinary cat with bright orange fur.',
-      imageUrl: 'assets/images/page3.png',
+      imageUrl: 'assets/images/gambar3.png',
     ),
     BookPage(
       content: 'Every night, Whiskers would curl up on Tim\'s bed, purring softly.',
-      imageUrl: 'assets/images/page4.png',
+      imageUrl: 'assets/images/gambar4.png',
     ),
     BookPage(
       content: 'One evening, as Tim was getting ready for bed, his parents came to tuck him in.',
-      imageUrl: 'assets/images/page5.png',
+      imageUrl: 'assets/images/gambar1.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'Whiskers jumped onto the bed with a toy mouse in his mouth.',
-      imageUrl: 'assets/images/page6.png',
+      imageUrl: 'assets/images/gambar2.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'Tim giggled as Whiskers chased the toy around the room.',
-      imageUrl: 'assets/images/page7.png',
+      imageUrl: 'assets/images/gambar3.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'His parents smiled, kissed Tim goodnight, and turned off the lights.',
-      imageUrl: 'assets/images/page8.png',
+      imageUrl: 'assets/images/gambar4.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'But Whiskers wasn\'t ready to sleep yet. He had a special talent.',
-      imageUrl: 'assets/images/page9.png',
+      imageUrl: 'assets/images/gambar1.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'As the moonlight filtered through the window, something magical began to happen.',
-      imageUrl: 'assets/images/page10.png',
+      imageUrl: 'assets/images/gambar2.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'Whiskers started to glow with a soft blue light, his eyes twinkling like stars.',
-      imageUrl: 'assets/images/page11.png',
+      imageUrl: 'assets/images/gambar3.png', // Repeated for demo purposes
     ),
     BookPage(
       content: 'And that night, Whiskers took Tim on an adventure beyond his wildest dreams...',
-      imageUrl: 'assets/images/page12.png',
+      imageUrl: 'assets/images/gambar4.png', // Repeated for demo purposes
     ),
   ];
 
   @override
   void onInit() {
     super.onInit();
+    // Start background music
+    _initBackgroundMusic();
+
     // Set up audio player listeners
     audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying.value = state == PlayerState.playing;
@@ -90,27 +98,48 @@ class BookReaderController extends GetxController {
         _startRecordingTimer();
       }
     });
+
+    // Listen for music volume changes
+    ever(musicVolume, (volume) {
+      backgroundMusicPlayer.setVolume(volume);
+    });
+
+    // Listen for music playing state changes
+    ever(isMusicPlaying, (playing) {
+      if (playing) {
+        backgroundMusicPlayer.resume();
+      } else {
+        backgroundMusicPlayer.pause();
+      }
+    });
+  }
+
+  void _initBackgroundMusic() async {
+    // In a real app, you would use an actual audio file
+    // await backgroundMusicPlayer.setSourceUrl('assets/audio/background_music.mp3');
+    // For now, let's just set the playing state
+    isMusicPlaying.value = true;
+
+    // Set initial volume
+    backgroundMusicPlayer.setVolume(musicVolume.value);
   }
 
   @override
   void onClose() {
     pageController.dispose();
     audioPlayer.dispose();
+    backgroundMusicPlayer.dispose();
     super.onClose();
   }
 
   void updatePage(int page) {
     if (page >= 0 && page < pages.length) {
       currentPage.value = page;
-      pageController.animateToPage(
-        page,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
 
       // If in listening mode, play the current page's audio
       if (isPlaying.value) {
         // Play audio for the current page (demo implementation)
+        // In a real app, you would use actual audio files
         // audioPlayer.play(AssetSource(pages[page].audioUrl ?? ''));
 
         // For demo purposes, we'll just print that we're playing
@@ -121,19 +150,28 @@ class BookReaderController extends GetxController {
 
   void nextPage() {
     if (currentPage.value < pages.length - 1) {
-      updatePage(currentPage.value + 1);
+      pageController.animateToPage(
+        currentPage.value + 1,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   void previousPage() {
     if (currentPage.value > 0) {
-      updatePage(currentPage.value - 1);
+      pageController.animateToPage(
+        currentPage.value - 1,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   void togglePlayPause() {
     if (isPlaying.value) {
       audioPlayer.pause();
+      isPlaying.value = false;
     } else {
       // In a real app, you would play the audio file for the current page
       // audioPlayer.play(AssetSource(pages[currentPage.value].audioUrl ?? ''));
@@ -141,8 +179,21 @@ class BookReaderController extends GetxController {
       // For demo purposes:
       isPlaying.value = true;
       Future.delayed(const Duration(seconds: 5), () {
-        isPlaying.value = false;
+        // Auto-stop after 5 seconds for demo purposes
+        if (isPlaying.value) {
+          isPlaying.value = false;
+        }
       });
+    }
+  }
+
+  void toggleBackgroundMusic() {
+    isMusicPlaying.value = !isMusicPlaying.value;
+  }
+
+  void setMusicVolume(double volume) {
+    if (volume >= 0.0 && volume <= 1.0) {
+      musicVolume.value = volume;
     }
   }
 
@@ -154,7 +205,7 @@ class BookReaderController extends GetxController {
     currentNarrator.value = narratorName;
     isRecording.value = true;
     recordingProgress.value = 0.0;
-    recordingTime.value = '00:0';
+    recordingTime.value = '00:00';
   }
 
   void stopRecording() {
@@ -166,14 +217,16 @@ class BookReaderController extends GetxController {
     // Simulated recording timer for demo purposes
     if (isRecording.value) {
       int seconds = 0;
-      recordingTime.value = '00:0';
+      recordingTime.value = '00:00';
 
       Future.doWhile(() async {
         await Future.delayed(const Duration(seconds: 1));
         if (!isRecording.value) return false;
 
         seconds++;
-        recordingTime.value = '00:${seconds}';
+        int minutes = seconds ~/ 60;
+        int remainingSeconds = seconds % 60;
+        recordingTime.value = '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
         recordingProgress.value = (seconds % 60) / 60; // Cycle every minute
 
         return isRecording.value;
