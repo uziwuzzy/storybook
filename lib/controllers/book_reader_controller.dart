@@ -1,13 +1,13 @@
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:storybook/models/book_reader.dart';
-import 'package:storybook/widgets/book_ending/book_ending_overlay.dart';
+import "package:get/get.dart";
+import "package:flutter/material.dart";
+import "package:audioplayers/audioplayers.dart";
+import "package:storybook/models/book_reader.dart";
+import "package:storybook/widgets/book_ending/book_ending_overlay.dart";
 
 class BookReaderController extends GetxController {
   // Page control
   final RxInt currentPage = 0.obs;
-  final PageController pageController = PageController();
+  late final PageController pageController;
   final RxBool showEndingOverlay = false.obs;
 
   // Audio control
@@ -17,7 +17,7 @@ class BookReaderController extends GetxController {
   final RxBool isRecording = false.obs;
   final RxString currentNarrator = ''.obs;
   final RxDouble recordingProgress = 0.0.obs;
-  final RxString recordingTime = '00:00'.obs;
+  final RxString recordingTime = "00:00".obs;
 
   // Background music control
   final RxBool isMusicPlaying = true.obs;
@@ -27,65 +27,68 @@ class BookReaderController extends GetxController {
   final RxBool showThumbnails = false.obs;
 
   // Book metadata for credits
-  final String authorName = 'ALTAI ZEINALOV';
-  final String illustratorName = 'ANNA GORLACH';
-  final String composerName = 'ARTEM AKMULIN';
+  final String authorName = "ALTAI ZEINALOV";
+  final String illustratorName = "ANNA GORLACH";
+  final String composerName = "ARTEM AKMULIN";
 
   // Sample pages for the book
   final List<BookPage> pages = [
     BookPage(
-      content: 'In an ordinary town, in an ordinary family...',
-      imageUrl: 'assets/images/gambar1.png',
+      content: "In an ordinary town, in an ordinary family...",
+      imageUrl: "assets/images/gambar1.png",
     ),
     BookPage(
-      content: 'There lived a boy named Tim with his parents and his cat Whiskers.',
-      imageUrl: 'assets/images/gambar2.png',
+      content: "There lived a boy named Tim with his parents and his cat Whiskers.",
+      imageUrl: "assets/images/gambar2.png",
     ),
     BookPage(
-      content: 'Whiskers was an extraordinary cat with bright orange fur.',
-      imageUrl: 'assets/images/gambar3.png',
+      content: "Whiskers was an extraordinary cat with bright orange fur.",
+      imageUrl: "assets/images/gambar3.png",
     ),
     BookPage(
-      content: 'Every night, Whiskers would curl up on Tim\'s bed, purring softly.',
-      imageUrl: 'assets/images/gambar4.png',
+      content: "Every night, Whiskers would curl up on Tim's bed, purring softly.",
+      imageUrl: "assets/images/gambar4.png",
     ),
     BookPage(
-      content: 'One evening, as Tim was getting ready for bed, his parents came to tuck him in.',
-      imageUrl: 'assets/images/gambar1.png', // Repeated for demo purposes
+      content: "One evening, as Tim was getting ready for bed, his parents came to tuck him in.",
+      imageUrl: "assets/images/gambar1.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'Whiskers jumped onto the bed with a toy mouse in his mouth.',
-      imageUrl: 'assets/images/gambar2.png', // Repeated for demo purposes
+      content: "Whiskers jumped onto the bed with a toy mouse in his mouth.",
+      imageUrl: "assets/images/gambar2.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'Tim giggled as Whiskers chased the toy around the room.',
-      imageUrl: 'assets/images/gambar3.png', // Repeated for demo purposes
+      content: "Tim giggled as Whiskers chased the toy around the room.",
+      imageUrl: "assets/images/gambar3.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'His parents smiled, kissed Tim goodnight, and turned off the lights.',
-      imageUrl: 'assets/images/gambar4.png', // Repeated for demo purposes
+      content: "His parents smiled, kissed Tim goodnight, and turned off the lights.",
+      imageUrl: "assets/images/gambar4.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'But Whiskers wasn\'t ready to sleep yet. He had a special talent.',
-      imageUrl: 'assets/images/gambar1.png', // Repeated for demo purposes
+      content: "But Whiskers wasn't ready to sleep yet. He had a special talent.",
+      imageUrl: "assets/images/gambar1.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'As the moonlight filtered through the window, something magical began to happen.',
-      imageUrl: 'assets/images/gambar2.png', // Repeated for demo purposes
+      content: "As the moonlight filtered through the window, something magical began to happen.",
+      imageUrl: "assets/images/gambar2.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'Whiskers started to glow with a soft blue light, his eyes twinkling like stars.',
-      imageUrl: 'assets/images/gambar3.png', // Repeated for demo purposes
+      content: "Whiskers started to glow with a soft blue light, his eyes twinkling like stars.",
+      imageUrl: "assets/images/gambar3.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: 'And that night, Whiskers took Tim on an adventure beyond his wildest dreams...',
-      imageUrl: 'assets/images/gambar4.png', // Repeated for demo purposes
+      content: "And that night, Whiskers took Tim on an adventure beyond his wildest dreams...",
+      imageUrl: "assets/images/gambar4.png", // Repeated for demo purposes
     ),
   ];
 
   @override
   void onInit() {
     super.onInit();
+    // Initialize PageController
+    pageController = PageController();
+
     // Start background music
     _initBackgroundMusic();
 
@@ -133,6 +136,7 @@ class BookReaderController extends GetxController {
 
   @override
   void onClose() {
+    // Critical fix: properly dispose of the PageController
     pageController.dispose();
     audioPlayer.dispose();
     backgroundMusicPlayer.dispose();
@@ -259,7 +263,7 @@ class BookReaderController extends GetxController {
     currentNarrator.value = narratorName;
     isRecording.value = true;
     recordingProgress.value = 0.0;
-    recordingTime.value = '00:00';
+    recordingTime.value = "00:00";
   }
 
   void stopRecording() {
@@ -271,7 +275,7 @@ class BookReaderController extends GetxController {
     // Simulated recording timer for demo purposes
     if (isRecording.value) {
       int seconds = 0;
-      recordingTime.value = '00:00';
+      recordingTime.value = "00:00";
 
       Future.doWhile(() async {
         await Future.delayed(const Duration(seconds: 1));
@@ -280,7 +284,7 @@ class BookReaderController extends GetxController {
         seconds++;
         int minutes = seconds ~/ 60;
         int remainingSeconds = seconds % 60;
-        recordingTime.value = '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+        recordingTime.value = "${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}";
         recordingProgress.value = (seconds % 60) / 60; // Cycle every minute
 
         return isRecording.value;
