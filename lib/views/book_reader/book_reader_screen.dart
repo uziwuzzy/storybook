@@ -73,18 +73,8 @@ class BookReaderScreen extends StatelessWidget {
         if (isRecording && controller.isRecording.value)
           const RecordingOverlay(),
 
-        // Thumbnails button for quick access
-        Positioned(
-          right: 20,
-          bottom: 20,
-          child: FloatingActionButton(
-            onPressed: controller.toggleThumbnails,
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.blue,
-            child: const Icon(Icons.grid_view),
-            tooltip: "Show all pages",
-          ),
-        ),
+        // We removed the floating action button for thumbnails here
+        // since it's already accessible through the BookHeader
       ],
     );
   }

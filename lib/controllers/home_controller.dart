@@ -23,26 +23,7 @@ class HomeController extends GetxController {
         author: 'Ella Story',
         thumbnailUrl: 'assets/images/luna_title.png',
         category: 'Adventure',
-      ),
-      Book(
-        title: 'Dino Friends',
-        author: 'Rexy Roar',
-        thumbnailUrl: 'assets/images/gambar2.png',
-        category: 'Animals',
-      ),
-      Book(
-        title: 'Space Pals',
-        author: 'Starry Sky',
-        thumbnailUrl: 'assets/images/gambar3.png',
-        category: 'Sci-Fi',
-        isPremium: true,
-      ),
-      Book(
-        title: 'Fairy Dust',
-        author: 'Tina Sparkle',
-        thumbnailUrl: 'assets/images/gambar4.png',
-        category: 'Fantasy',
-      ),
+      )
     ]);
     filteredBooks.assignAll(books);
   }

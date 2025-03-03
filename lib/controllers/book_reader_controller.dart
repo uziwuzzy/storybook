@@ -84,10 +84,6 @@ She gasped. The magic wasn’t a place—it was within her all along!""",
       content: """As she walked home, the world looked brighter—the grass whispered secrets, the wind hummed songs, and the stars blinked just for her.
 She had found what she was looking for: magic was everywhere, as long as she believed.""",
       imageUrl: "assets/images/luna_10.png", // Repeated for demo purposes
-    ),
-    BookPage(
-      content: "Whiskers started to glow with a soft blue light, his eyes twinkling like stars.",
-      imageUrl: "assets/images/gambar3.png", // Repeated for demo purposes
     )
   ];
 

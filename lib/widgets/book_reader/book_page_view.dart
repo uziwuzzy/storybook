@@ -20,32 +20,67 @@ class BookPageView extends StatefulWidget {
 class _BookPageViewState extends State<BookPageView> with AutomaticKeepAliveClientMixin {
   final BookReaderController controller = Get.find<BookReaderController>();
   PageController? _pageController;
+  int _currentVisiblePage = 0; // Track the visible page locally
 
   @override
   void initState() {
     super.initState();
-    // Create the PageController here in initState
-    _pageController = PageController(initialPage: controller.currentPage.value);
+    // Initialize with the controller's current page
+    _currentVisiblePage = controller.currentPage.value;
 
-    // Listen for changes to the current page and update the controller's value
-    _pageController!.addListener(_updateControllerPage);
+    // Create PageController with initial page
+    _pageController = PageController(initialPage: _currentVisiblePage);
+
+    // Add page change listener
+    _pageController!.addListener(_handlePageChange);
+
+    // Listen for external page change requests
+    _setupPageChangeListener();
   }
 
-  void _updateControllerPage() {
+  void _setupPageChangeListener() {
+    // This worker will run whenever the controller's currentPage changes
+    ever(controller.currentPage, (int page) {
+      // Only animate if the page actually changed and we're not already on that page
+      if (page != _currentVisiblePage && _pageController != null && _pageController!.hasClients) {
+        // Use post-frame callback to avoid animation during build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _pageController != null && _pageController!.hasClients) {
+            _pageController!.animateToPage(
+              page,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
+      }
+    });
+  }
+
+  void _handlePageChange() {
     if (_pageController != null &&
+        _pageController!.hasClients &&
         _pageController!.positions.isNotEmpty &&
         _pageController!.page != null) {
-      final currentPage = _pageController!.page!.round();
-      if (currentPage != controller.currentPage.value) {
-        controller.updatePage(currentPage);
+      // Get the current page as an integer
+      final newPage = _pageController!.page!.round();
+
+      // Update local tracking variable
+      if (newPage != _currentVisiblePage) {
+        _currentVisiblePage = newPage;
+
+        // Update the controller but avoid circular updates
+        if (newPage != controller.currentPage.value) {
+          controller.updatePage(newPage);
+        }
       }
     }
   }
 
   @override
   void dispose() {
-    // Properly remove listener and dispose of PageController
-    _pageController?.removeListener(_updateControllerPage);
+    // Clean up
+    _pageController?.removeListener(_handlePageChange);
     _pageController?.dispose();
     _pageController = null;
     super.dispose();
@@ -55,35 +90,20 @@ class _BookPageViewState extends State<BookPageView> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
 
-    // Set up listener in build method for current page
-    // This is safer than using Obx for PageController animations
-    final currentPage = controller.currentPage.value;
-
-    // If the controller page changed from elsewhere, animate to it
-    if (_pageController != null &&
-        _pageController!.hasClients &&
-        currentPage != _pageController!.page?.round()) {
-      // Schedule animation after the current build is complete
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _pageController != null && _pageController!.hasClients) {
-          _pageController!.animateToPage(
-            currentPage,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        }
-      });
-    }
-
     return PageView.builder(
       controller: _pageController,
       itemCount: controller.totalPages,
       physics: const ClampingScrollPhysics(), // Prevent multi-page scrolling
-      itemBuilder: (context, index) => Obx(() => BookPageWidget(
-        page: controller.pages[index],
-        isListening: widget.isListening,
-        isRecording: widget.isRecording && controller.isRecording.value,
-      )),
+      itemBuilder: (context, index) {
+        // Use GetBuilder instead of Obx for more control
+        return GetBuilder<BookReaderController>(
+          builder: (ctrl) => BookPageWidget(
+            page: ctrl.pages[index],
+            isListening: widget.isListening,
+            isRecording: widget.isRecording && ctrl.isRecording.value,
+          ),
+        );
+      },
     );
   }
 

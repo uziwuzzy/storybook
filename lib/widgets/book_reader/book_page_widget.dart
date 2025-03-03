@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:storybook/models/book_reader.dart';
-import 'package:storybook/controllers/book_reader_controller.dart';
-import 'package:storybook/config/app_colors.dart';
+import "package:flutter/material.dart";
+import "package:get/get.dart";
+import "package:storybook/models/book_reader.dart";
+import "package:storybook/controllers/book_reader_controller.dart";
+import "package:storybook/config/app_colors.dart";
 
 class BookPageWidget extends StatelessWidget {
   final BookPage page;
@@ -46,51 +46,70 @@ class BookPageWidget extends StatelessWidget {
           bottom: 0,
           child: Container(
             color: Colors.black.withOpacity(0.5),
-            child: Row(
-              children: [
-                // Left navigation arrow
-                Container(
-                  width: 60,
-                  child: IconButton(
-                    iconSize: 40,
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ),
-                    onPressed: currentPage > 1 ? controller.previousPage : null,
-                  ),
-                ),
-
-                // Text content
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                    child: Text(
-                      page.content,
-                      style: const TextStyle(
-                        fontFamily: 'Nunito',
-                        fontSize: 22,
-                        height: 1.5,
-                        color: Colors.white,
+            height: MediaQuery.of(context).size.height / 3, // Height is 1/3 of screen
+            child: SafeArea(
+              // Ensures content is within safe area on devices with notches
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      child: Center(
+                        child: Text(
+                          page.content,
+                          style: const TextStyle(
+                            fontFamily: "Nunito",
+                            fontSize: 22,
+                            height: 1.5,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
 
-                // Right navigation arrow
-                Container(
-                  width: 60,
-                  child: IconButton(
-                    iconSize: 40,
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
+                  // Navigation controls
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Left navigation arrow
+                        IconButton(
+                          iconSize: 40,
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
+                          onPressed: currentPage > 1 ? controller.previousPage : null,
+                        ),
+
+                        // Page indicator
+                        Text(
+                          "$currentPage/$totalPages",
+                          style: const TextStyle(
+                            fontFamily: "Nunito",
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        // Right navigation arrow
+                        IconButton(
+                          iconSize: 40,
+                          icon: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white,
+                          ),
+                          onPressed: controller.nextPage,
+                        ),
+                      ],
                     ),
-                    onPressed: controller.nextPage,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -127,9 +146,9 @@ class BookPageWidget extends StatelessWidget {
                       onPressed: controller.togglePlayPause,
                     ),
                     const Text(
-                      '00,0',
+                      "00,0",
                       style: TextStyle(
-                        fontFamily: 'Baloo',
+                        fontFamily: "Baloo",
                         fontSize: 24,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -171,9 +190,9 @@ class BookPageWidget extends StatelessWidget {
                     const Icon(Icons.mic, color: Colors.white),
                     const SizedBox(width: 8),
                     Obx(() => Text(
-                      'Recording ${controller.recordingTime.value}',
+                      "Recording ${controller.recordingTime.value}",
                       style: const TextStyle(
-                        fontFamily: 'Baloo',
+                        fontFamily: "Baloo",
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -207,9 +226,9 @@ class BookPageWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Image loading...',
+              "Image loading...",
               style: TextStyle(
-                fontFamily: 'Nunito',
+                fontFamily: "Nunito",
                 color: Colors.grey.shade600,
               ),
             ),
