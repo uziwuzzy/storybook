@@ -7,7 +7,6 @@ import "package:storybook/widgets/book_ending/book_ending_overlay.dart";
 class BookReaderController extends GetxController {
   // Page control
   final RxInt currentPage = 0.obs;
-  late final PageController pageController;
   final RxBool showEndingOverlay = false.obs;
 
   // Audio control
@@ -34,63 +33,67 @@ class BookReaderController extends GetxController {
   // Sample pages for the book
   final List<BookPage> pages = [
     BookPage(
-      content: "In an ordinary town, in an ordinary family...",
-      imageUrl: "assets/images/gambar1.png",
+      content: "One sunny morning, Luna, a curious girl with a big imagination, set off on an adventure. She loved exploring, but today felt different. The wind whispered her name, and the flowers swayed as if inviting her somewhere special.",
+      imageUrl: "assets/images/luna_1.png",
     ),
     BookPage(
-      content: "There lived a boy named Tim with his parents and his cat Whiskers.",
-      imageUrl: "assets/images/gambar2.png",
+      content: """As Luna walked through the golden fields, she saw something incredible—a giant giraffe with deep purple spots, resting like a lazy cloud.
+
+"Where are you going?" the giraffe asked with a smile.
+
+"I'm not sure," Luna said, "but I want to find something magical."
+
+"Hop on," the giraffe said, kneeling down.""",
+      imageUrl: "assets/images/luna_2.png",
     ),
     BookPage(
-      content: "Whiskers was an extraordinary cat with bright orange fur.",
-      imageUrl: "assets/images/gambar3.png",
+      content: "Luna climbed onto the giraffe's back, and off they went—running through fields that turned into rivers of stars! The clouds swirled into shapes, and the sun painted golden patterns in the sky.",
+      imageUrl: "assets/images/luna_3.png",
     ),
     BookPage(
-      content: "Every night, Whiskers would curl up on Tim's bed, purring softly.",
-      imageUrl: "assets/images/gambar4.png",
+      content: """They arrived at a hidden meadow where a gigantic black cat was stretched out like a fluffy mountain. Its big, glowing eyes blinked slowly.
+      "You seek magic?" the cat purred.""",
+      imageUrl: "assets/images/luna_4.png",
     ),
     BookPage(
-      content: "One evening, as Tim was getting ready for bed, his parents came to tuck him in.",
-      imageUrl: "assets/images/gambar1.png", // Repeated for demo purposes
+      content: """The cat flicked its tail, and suddenly, Luna felt lighter—as if she could float!
+      "Magic is everywhere," the cat whispered. "But you must look with wonder.""",
+      imageUrl: "assets/images/luna_5.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: "Whiskers jumped onto the bed with a toy mouse in his mouth.",
-      imageUrl: "assets/images/gambar2.png", // Repeated for demo purposes
+      content: """Luna stepped off the giraffe and twirled through the meadow. Tiny golden fireflies danced around her, forming patterns in the air—stars, moons, and swirling galaxies!""",
+      imageUrl: "assets/images/luna_6.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: "Tim giggled as Whiskers chased the toy around the room.",
-      imageUrl: "assets/images/gambar3.png", // Repeated for demo purposes
+      content: """As she danced, a hidden door appeared in a tree, glowing softly.
+    "What’s inside?" she wondered.
+    "The answer to your heart’s biggest question," the cat said.""",
+      imageUrl: "assets/images/luna_7.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: "His parents smiled, kissed Tim goodnight, and turned off the lights.",
-      imageUrl: "assets/images/gambar4.png", // Repeated for demo purposes
+      content: """Inside, Luna saw mirrors reflecting her adventures—the giraffe’s kindness, the cat’s wisdom, and the wonder of the world.
+She gasped. The magic wasn’t a place—it was within her all along!""",
+      imageUrl: "assets/images/luna_8.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: "But Whiskers wasn't ready to sleep yet. He had a special talent.",
-      imageUrl: "assets/images/gambar1.png", // Repeated for demo purposes
+      content: """Luna stepped out of the tree, feeling different. She hugged the giraffe’s long neck and scratched behind the cat’s ears.
+"Thank you," she whispered.""",
+      imageUrl: "assets/images/luna_9.png", // Repeated for demo purposes
     ),
     BookPage(
-      content: "As the moonlight filtered through the window, something magical began to happen.",
-      imageUrl: "assets/images/gambar2.png", // Repeated for demo purposes
+      content: """As she walked home, the world looked brighter—the grass whispered secrets, the wind hummed songs, and the stars blinked just for her.
+She had found what she was looking for: magic was everywhere, as long as she believed.""",
+      imageUrl: "assets/images/luna_10.png", // Repeated for demo purposes
     ),
     BookPage(
       content: "Whiskers started to glow with a soft blue light, his eyes twinkling like stars.",
       imageUrl: "assets/images/gambar3.png", // Repeated for demo purposes
-    ),
-    BookPage(
-      content: "And that night, Whiskers took Tim on an adventure beyond his wildest dreams...",
-      imageUrl: "assets/images/gambar4.png", // Repeated for demo purposes
-    ),
+    )
   ];
 
   @override
   void onInit() {
     super.onInit();
-    // Initialize PageController
-    pageController = PageController();
-
-    // Start background music
-    _initBackgroundMusic();
 
     // Set up audio player listeners
     audioPlayer.onPlayerStateChanged.listen((state) {
@@ -122,6 +125,9 @@ class BookReaderController extends GetxController {
         backgroundMusicPlayer.pause();
       }
     });
+
+    // Initialize background music
+    _initBackgroundMusic();
   }
 
   void _initBackgroundMusic() async {
@@ -136,8 +142,6 @@ class BookReaderController extends GetxController {
 
   @override
   void onClose() {
-    // Critical fix: properly dispose of the PageController
-    pageController.dispose();
     audioPlayer.dispose();
     backgroundMusicPlayer.dispose();
     super.onClose();
@@ -164,15 +168,7 @@ class BookReaderController extends GetxController {
 
     if (currentPage.value < pages.length - 1) {
       // Move to next page
-      int nextPageIndex = currentPage.value + 1;
-      currentPage.value = nextPageIndex;
-
-      // Animate to that page
-      pageController.animateToPage(
-        nextPageIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
+      updatePage(currentPage.value + 1);
     } else {
       // We're at the last page, show ending
       print('Showing ending overlay');
@@ -182,14 +178,7 @@ class BookReaderController extends GetxController {
 
   void previousPage() {
     if (currentPage.value > 0) {
-      int prevPageIndex = currentPage.value - 1;
-      currentPage.value = prevPageIndex;
-
-      pageController.animateToPage(
-        prevPageIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
+      updatePage(currentPage.value - 1);
     }
   }
 
@@ -218,12 +207,7 @@ class BookReaderController extends GetxController {
 
   void restartBook() {
     // Reset to the first page
-    currentPage.value = 0;
-    pageController.animateToPage(
-      0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+    updatePage(0);
   }
 
   void togglePlayPause() {

@@ -19,9 +19,9 @@ class HomeController extends GetxController {
   void loadMockBooks() {
     books.assignAll([
       Book(
-        title: 'The Magic Tree',
+        title: 'Title: The Girl and the Giant Friends',
         author: 'Ella Story',
-        thumbnailUrl: 'assets/images/gambar1.png',
+        thumbnailUrl: 'assets/images/luna_title.png',
         category: 'Adventure',
       ),
       Book(

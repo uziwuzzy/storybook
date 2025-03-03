@@ -2,13 +2,13 @@ import "package:flutter/material.dart";
 import "package:get/get.dart";
 import "package:storybook/controllers/book_reader_controller.dart";
 import "package:storybook/widgets/book_reader/thumbnails_grid.dart";
-import "package:storybook/widgets/book_reader/book_page_widget.dart";
+import "package:storybook/widgets/book_reader/book_page_view.dart";
 import "package:storybook/widgets/book_reader/book_header.dart";
 import "package:storybook/widgets/book_reader/recording_overlay.dart";
 import "package:storybook/widgets/book_reader/audio_progress_bar.dart";
 
 class BookReaderScreen extends StatelessWidget {
-  BookReaderScreen({Key? key}) : super(key: key);
+  const BookReaderScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +50,9 @@ class BookReaderScreen extends StatelessWidget {
     return Stack(
       children: [
         // Main content - page view
-        PageView.builder(
-          controller: controller.pageController,
-          itemCount: controller.totalPages,
-          onPageChanged: (index) => controller.updatePage(index),
-          physics: const ClampingScrollPhysics(), // Prevent multi-page scrolling
-          itemBuilder: (context, index) => BookPageWidget(
-            page: controller.pages[index],
-            isListening: isListening,
-            isRecording: isRecording && controller.isRecording.value,
-          ),
+        BookPageView(
+          isListening: isListening,
+          isRecording: isRecording,
         ),
 
         // Header at the top
