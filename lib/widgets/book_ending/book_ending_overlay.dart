@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:storybook/config/app_colors.dart';
-import 'package:storybook/routes/app_routes.dart';
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:get/get.dart";
+import "package:storybook/config/app_colors.dart";
+import "package:storybook/routes/app_routes.dart";
 
 class BookEndingOverlay extends StatelessWidget {
   final String authorName;
@@ -11,153 +12,176 @@ class BookEndingOverlay extends StatelessWidget {
 
   const BookEndingOverlay({
     Key? key,
-    this.authorName = 'ALTAI ZEINALOV',
-    this.illustratorName = 'ANNA GORLACH',
-    this.composerName = 'ARTEM AKMULIN',
+    this.authorName = "ALTAI ZEINALOV",
+    this.illustratorName = "ANNA GORLACH",
+    this.composerName = "ARTEM AKMULIN",
     this.onRestartBook,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: Colors.indigo.shade900.withOpacity(0.9),
+    final RxInt rating = 0.obs;
+    final overlayColor = Colors.indigo.shade900.withOpacity(0.95);
+
+    return Material(
+      color: Colors.transparent,
       child: Stack(
         children: [
-          // Decorative stars
-          _buildStarsBackground(),
-
-          // Close button
-          Positioned(
-            top: 20,
-            left: 20,
+          // Full screen background
+          Positioned.fill(
             child: Container(
-              width: 50,
-              height: 50,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.indigo,
-                  size: 30,
-                ),
-                onPressed: () {
-                  Get.back(); // Dismiss overlay
-                },
-              ),
+              color: overlayColor,
             ),
           ),
 
-          // Content columns
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
               children: [
-                // Top navigation buttons
-                _buildActionButton(
-                  icon: Icons.share,
-                  label: 'Share',
-                  color: Colors.blue,
-                  onTap: () {
-                    // Share functionality
-                    Get.snackbar(
-                      'Share',
-                      'Sharing functionality would go here',
-                      backgroundColor: Colors.blue,
-                      colorText: Colors.white,
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
+                // Decorative stars background
+                _buildStarsBackground(),
 
-                _buildActionButton(
-                  icon: Icons.menu_book,
-                  label: 'To the beginning',
-                  color: Colors.lightBlue,
-                  onTap: () {
-                    Get.back();
-                    if (onRestartBook != null) {
-                      onRestartBook!();
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                _buildActionButton(
-                  icon: Icons.home,
-                  label: 'To the library',
-                  color: Colors.orange,
-                  onTap: () {
-                    Get.offAllNamed(AppRoutes.HOME);
-                  },
-                ),
-                const SizedBox(height: 30),
-
-                // Rating stars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _buildRatingStar(i),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-
-                // Credits section with vertical line
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left credits section
-                    Expanded(
-                      flex: 2,
-                      child: Container(),
+                // Main content
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 40,
+                      left: 24,
+                      right: 24,
                     ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Action buttons
+                        _buildActionButton(
+                          icon: Icons.share,
+                          label: "Share",
+                          color: Colors.blue,
+                          onTap: () {
+                            Get.snackbar(
+                              "Share",
+                              "Sharing functionality would go here",
+                              backgroundColor: Colors.blue,
+                              colorText: Colors.white,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
 
-                    // Vertical line
-                    Container(
-                      width: 1,
-                      height: 180,
-                      color: Colors.white.withOpacity(0.3),
-                    ),
+                        _buildActionButton(
+                          icon: Icons.menu_book,
+                          label: "To the beginning",
+                          color: Colors.lightBlue,
+                          onTap: () {
+                            Get.back();
+                            if (onRestartBook != null) {
+                              onRestartBook!();
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 20),
 
-                    // Right credits section
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 40),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Featuring:',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Baloo',
+                        _buildActionButton(
+                          icon: Icons.home,
+                          label: "To the library",
+                          color: Colors.orange,
+                          onTap: () {
+                            Get.offAllNamed(AppRoutes.HOME);
+                          },
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Rating stars
+                        Text(
+                          "How was the story?",
+                          style: TextStyle(
+                            fontFamily: "Baloo",
+                            fontSize: 24,
+                            color: Colors.amber.shade300,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Simple star rating
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (index) {
+                            return Obx(() => GestureDetector(
+                              onTap: () => rating.value = index + 1,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(
+                                  index < rating.value ? Icons.star : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 40,
+                                ),
                               ),
-                              textAlign: TextAlign.left,
-                            ),
-                            const SizedBox(height: 20),
+                            ));
+                          }),
+                        ),
+                        const SizedBox(height: 40),
 
-                            _buildCredit('Author', authorName),
-                            const SizedBox(height: 15),
-                            _buildCredit('Illustrator', illustratorName),
-                            const SizedBox(height: 15),
-                            _buildCredit('Composer', composerName),
+                        // Credits section
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 180,
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 40),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Featuring:",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: "Baloo",
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    _buildCredit("Author", authorName),
+                                    const SizedBox(height: 15),
+                                    _buildCredit("Illustrator", illustratorName),
+                                    const SizedBox(height: 15),
+                                    _buildCredit("Composer", composerName),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 40),
+                      ],
                     ),
-                  ],
+                  ),
+                ),
+
+                // Close button
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  right: 20,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Get.back(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -221,7 +245,7 @@ class BookEndingOverlay extends StatelessWidget {
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Baloo',
+                fontFamily: "Baloo",
               ),
             ),
           ],
@@ -241,7 +265,7 @@ class BookEndingOverlay extends StatelessWidget {
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 18,
-              fontFamily: 'Nunito',
+              fontFamily: "Nunito",
             ),
           ),
         ),
@@ -252,34 +276,11 @@ class BookEndingOverlay extends StatelessWidget {
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Baloo',
+              fontFamily: "Baloo",
             ),
           ),
         ),
       ],
-    );
-  }
-
-  // Rating stars
-  Widget _buildRatingStar(int index) {
-    final RxList<bool> selectedStars = List.generate(5, (_) => false).obs;
-
-    return GestureDetector(
-      onTap: () {
-        // Fill all stars up to and including the tapped one
-        for (int i = 0; i <= index; i++) {
-          selectedStars[i] = true;
-        }
-        // Clear stars after the tapped one
-        for (int i = index + 1; i < selectedStars.length; i++) {
-          selectedStars[i] = false;
-        }
-      },
-      child: Obx(() => Icon(
-        selectedStars[index] ? Icons.star : Icons.star_border,
-        color: Colors.amber,
-        size: 40,
-      )),
     );
   }
 }

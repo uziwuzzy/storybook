@@ -20,30 +20,19 @@ class BookPageView extends StatefulWidget {
 class _BookPageViewState extends State<BookPageView> with AutomaticKeepAliveClientMixin {
   final BookReaderController controller = Get.find<BookReaderController>();
   PageController? _pageController;
-  int _currentVisiblePage = 0; // Track the visible page locally
+  int _currentVisiblePage = 0;
 
   @override
   void initState() {
     super.initState();
-    // Initialize with the controller's current page
     _currentVisiblePage = controller.currentPage.value;
-
-    // Create PageController with initial page
     _pageController = PageController(initialPage: _currentVisiblePage);
-
-    // Add page change listener
-    _pageController!.addListener(_handlePageChange);
-
-    // Listen for external page change requests
     _setupPageChangeListener();
   }
 
   void _setupPageChangeListener() {
-    // This worker will run whenever the controller's currentPage changes
     ever(controller.currentPage, (int page) {
-      // Only animate if the page actually changed and we're not already on that page
       if (page != _currentVisiblePage && _pageController != null && _pageController!.hasClients) {
-        // Use post-frame callback to avoid animation during build
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted && _pageController != null && _pageController!.hasClients) {
             _pageController!.animateToPage(
@@ -57,30 +46,8 @@ class _BookPageViewState extends State<BookPageView> with AutomaticKeepAliveClie
     });
   }
 
-  void _handlePageChange() {
-    if (_pageController != null &&
-        _pageController!.hasClients &&
-        _pageController!.positions.isNotEmpty &&
-        _pageController!.page != null) {
-      // Get the current page as an integer
-      final newPage = _pageController!.page!.round();
-
-      // Update local tracking variable
-      if (newPage != _currentVisiblePage) {
-        _currentVisiblePage = newPage;
-
-        // Update the controller but avoid circular updates
-        if (newPage != controller.currentPage.value) {
-          controller.updatePage(newPage);
-        }
-      }
-    }
-  }
-
   @override
   void dispose() {
-    // Clean up
-    _pageController?.removeListener(_handlePageChange);
     _pageController?.dispose();
     _pageController = null;
     super.dispose();
@@ -90,20 +57,34 @@ class _BookPageViewState extends State<BookPageView> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
 
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: controller.totalPages,
-      physics: const ClampingScrollPhysics(), // Prevent multi-page scrolling
-      itemBuilder: (context, index) {
-        // Use GetBuilder instead of Obx for more control
-        return GetBuilder<BookReaderController>(
-          builder: (ctrl) => BookPageWidget(
-            page: ctrl.pages[index],
-            isListening: widget.isListening,
-            isRecording: widget.isRecording && ctrl.isRecording.value,
-          ),
-        );
+    return Listener(
+      onPointerUp: (event) {
+        if (_currentVisiblePage == controller.totalPages - 1 &&
+            _pageController != null &&
+            _pageController!.position.pixels > _pageController!.position.maxScrollExtent) {
+          controller.displayEndingOverlay();
+        }
       },
+      child: PageView.builder(
+        controller: _pageController,
+        itemCount: controller.totalPages,
+        physics: const BouncingScrollPhysics(),
+        onPageChanged: (int page) {
+          _currentVisiblePage = page;
+          if (page != controller.currentPage.value) {
+            controller.updatePage(page);
+          }
+        },
+        itemBuilder: (context, index) {
+          return GetBuilder<BookReaderController>(
+            builder: (ctrl) => BookPageWidget(
+              page: ctrl.pages[index],
+              isListening: widget.isListening,
+              isRecording: widget.isRecording && ctrl.isRecording.value,
+            ),
+          );
+        },
+      ),
     );
   }
 
