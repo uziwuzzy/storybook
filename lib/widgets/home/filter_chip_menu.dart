@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
 class FilterChipMenu extends StatelessWidget {
   final String label;
@@ -18,11 +18,19 @@ class FilterChipMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if we're in landscape mode on a small device
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isSmallDevice = MediaQuery.of(context).size.width < 600;
+    final useCompactMode = isLandscape && isSmallDevice;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(right: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        margin: EdgeInsets.only(right: useCompactMode ? 6 : 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: useCompactMode ? 10 : 14,
+            vertical: useCompactMode ? 6 : 8
+        ),
         decoration: BoxDecoration(
           color: isSelected ? color : color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(30),
@@ -37,16 +45,16 @@ class FilterChipMenu extends StatelessWidget {
             if (icon != null) ...[
               Icon(
                 icon,
-                size: 16,
+                size: useCompactMode ? 14 : 16,
                 color: isSelected ? Colors.white : color,
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: useCompactMode ? 4 : 6),
             ],
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'Nunito',
-                fontSize: 14,
+                fontFamily: "Nunito",
+                fontSize: useCompactMode ? 12 : 14,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? Colors.white : color,
               ),

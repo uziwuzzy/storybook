@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:storybook/models/book.dart';
-import 'package:storybook/utils/ui_utils.dart';
+import "package:flutter/material.dart";
+import "package:storybook/models/book.dart";
+import "package:storybook/utils/ui_utils.dart";
 
 class BookCard extends StatelessWidget {
   final Book book;
@@ -14,12 +14,19 @@ class BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if we're in landscape mode
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isSmallDevice = MediaQuery.of(context).size.width < 600;
+
+    // Use more compact style in landscape mode on phones
+    final useCompactMode = isLandscape && isSmallDevice;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(useCompactMode ? 16 : 20),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -41,7 +48,7 @@ class BookCard extends StatelessWidget {
                   color: Colors.grey[200],
                   child: Icon(
                     Icons.book,
-                    size: 48,
+                    size: useCompactMode ? 36 : 48,
                     color: Colors.grey[400],
                   ),
                 );
@@ -70,40 +77,40 @@ class BookCard extends StatelessWidget {
               left: 0,
               right: 0,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(useCompactMode ? 12 : 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       book.title,
-                      style: const TextStyle(
-                        fontFamily: 'Baloo',
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontFamily: "Baloo",
+                        fontSize: useCompactMode ? 14 : 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
-                      maxLines: 4,
+                      maxLines: useCompactMode ? 2 : 4,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: useCompactMode ? 4 : 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Category badge
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: useCompactMode ? 6 : 10,
+                            vertical: useCompactMode ? 3 : 5,
                           ),
                           decoration: BoxDecoration(
                             color: UiUtils.getCategoryColor(book.category).withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(useCompactMode ? 8 : 12),
                           ),
                           child: Text(
                             book.category,
-                            style: const TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 12,
+                            style: TextStyle(
+                              fontFamily: "Nunito",
+                              fontSize: useCompactMode ? 10 : 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -113,16 +120,16 @@ class BookCard extends StatelessWidget {
                         // Premium lock icon
                         if (book.isPremium)
                           Container(
-                            width: 36,
-                            height: 36,
+                            width: useCompactMode ? 28 : 36,
+                            height: useCompactMode ? 28 : 36,
                             decoration: BoxDecoration(
                               color: Colors.amber.withOpacity(0.9),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.lock,
                               color: Colors.white,
-                              size: 20,
+                              size: useCompactMode ? 16 : 20,
                             ),
                           ),
                       ],

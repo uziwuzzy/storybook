@@ -4,11 +4,11 @@ import "package:storybook/controllers/home_controller.dart";
 import "package:storybook/config/app_colors.dart";
 import "package:storybook/widgets/dialogs/premium_paywall_dialog.dart";
 import "package:storybook/widgets/dialogs/settings_dialog.dart";
-import "package:storybook/widgets/home/filter_section_tab.dart";
-import "package:storybook/widgets/home/filter_chip_menu.dart";
 import "package:storybook/widgets/home/book_card.dart";
 import "package:storybook/widgets/common/circle_button.dart";
 import "package:storybook/utils/ui_utils.dart";
+// Import our new responsive search filters
+import "package:storybook/widgets/home/responsive_search_filters.dart";
 
 class HomeScreen extends StatelessWidget {
   final HomeController _controller = Get.find<HomeController>();
@@ -19,6 +19,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check orientation for landscape-specific layout
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -52,184 +56,87 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Main content
+          // Main content - use different layouts for landscape vs portrait
           SafeArea(
-            child: Column(
-              children: [
-                // Enhanced header with profile and settings - using a custom widget
-                _ResponsiveHeader(
-                  controller: _controller,
-                  isMusicPlaying: _isMusicPlaying,
-                ),
-
-                // Search and filters area with rounded corners
-                _buildSearchAndFilters(),
-
-                // Books Grid
-                Expanded(
-                  child: Obx(() {
-                    if (_controller.filteredBooks.isEmpty) {
-                      return _buildEmptyState();
-                    }
-                    return _buildBooksGrid();
-                  }),
-                ),
-              ],
-            ),
+            child: isLandscape && !isTablet
+                ? _buildLandscapeLayout(context)
+                : _buildPortraitLayout(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchAndFilters() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Search Bar with fun icon
-          TextField(
-            onChanged: _controller.searchBooks,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              hintText: "Find a magical story...",
-              hintStyle: TextStyle(
-                fontFamily: "Nunito",
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: AppColors.primary,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 14,
-              ),
-            ),
-          ),
+  // Portrait layout (vertical orientation)
+  Widget _buildPortraitLayout(BuildContext context) {
+    return Column(
+      children: [
+        // Header with app logo, settings, etc.
+        _ResponsiveHeader(
+          controller: _controller,
+          isMusicPlaying: _isMusicPlaying,
+        ),
 
-          const SizedBox(height: 12),
+        // Responsive search and filters
+        ResponsiveSearchFilters(
+          controller: _controller,
+          activeFilterSection: _activeFilterSection,
+        ),
 
-          // Filter section tabs in a scrollable row for smaller screens
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Obx(() => Row(
-              children: [
-                FilterSectionTab(
-                  label: "Category",
-                  isSelected: _activeFilterSection.value == "Category",
-                  onTap: () => _activeFilterSection.value = "Category",
-                ),
-                FilterSectionTab(
-                  label: "Age",
-                  isSelected: _activeFilterSection.value == "Age",
-                  onTap: () => _activeFilterSection.value = "Age",
-                ),
-                FilterSectionTab(
-                  label: "Values",
-                  isSelected: _activeFilterSection.value == "Values",
-                  onTap: () => _activeFilterSection.value = "Values",
-                ),
-              ],
-            )),
-          ),
+        // Books Grid
+        Expanded(
+          child: Obx(() {
+            if (_controller.filteredBooks.isEmpty) {
+              return _buildEmptyState();
+            }
+            return _buildBooksGrid();
+          }),
+        ),
+      ],
+    );
+  }
 
-          const SizedBox(height: 12),
+  // Landscape layout (horizontal orientation)
+  Widget _buildLandscapeLayout(BuildContext context) {
+    return Column(
+      children: [
+        // Header with app logo, settings, etc. - reduced padding
+        _ResponsiveHeader(
+          controller: _controller,
+          isMusicPlaying: _isMusicPlaying,
+          useCompactMode: true,
+        ),
 
-          // Filter chips based on selected section
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Obx(() {
-              List<Widget> filterChips = [];
+        // Responsive search and filters - already handles landscape
+        ResponsiveSearchFilters(
+          controller: _controller,
+          activeFilterSection: _activeFilterSection,
+        ),
 
-              // Always show "All" option first
-              filterChips.add(
-                FilterChipMenu(
-                  label: "All",
-                  isSelected: _controller.selectedCategory.value == "All",
-                  onTap: () => _controller.filterByCategory("All"),
-                  color: AppColors.primary,
-                ),
-              );
-
-              // Add chips based on selected filter section
-              if (_activeFilterSection.value == "Category") {
-                filterChips.addAll(
-                  ["Adventure", "Fantasy", "Animals", "Sci-Fi"].map((category) =>
-                      FilterChipMenu(
-                        label: category,
-                        isSelected: _controller.selectedCategory.value == category,
-                        onTap: () => _controller.filterByCategory(category),
-                        color: UiUtils.getCategoryColor(category),
-                      ),
-                  ),
-                );
-              } else if (_activeFilterSection.value == "Age") {
-                filterChips.addAll(
-                  ["3-5", "6-8", "9-12"].map((age) =>
-                      FilterChipMenu(
-                        label: age,
-                        isSelected: false, // Implement age filtering in the future
-                        onTap: () => UiUtils.showComingSoonMessage("Age filter for $age years"),
-                        color: Colors.teal,
-                      ),
-                  ),
-                );
-              } else if (_activeFilterSection.value == "Values") {
-                filterChips.addAll(
-                  ["Kindness", "Friendship", "Courage", "Honesty"].map((value) =>
-                      FilterChipMenu(
-                        label: value,
-                        isSelected: false, // Implement values filtering in the future
-                        onTap: () => UiUtils.showComingSoonMessage("$value filter"),
-                        color: Colors.deepPurple,
-                      ),
-                  ),
-                );
-              }
-
-              // Add Premium filter at the end
-              filterChips.add(
-                FilterChipMenu(
-                  label: "Premium",
-                  isSelected: false, // Implement premium filter if needed
-                  onTap: () => PremiumPaywallDialog.show(),
-                  color: Colors.amber,
-                  icon: Icons.star,
-                ),
-              );
-
-              return Row(children: filterChips);
-            }),
-          ),
-        ],
-      ),
+        // Books Grid - takes remaining space
+        Expanded(
+          child: Obx(() {
+            if (_controller.filteredBooks.isEmpty) {
+              return _buildEmptyState();
+            }
+            return _buildBooksGrid();
+          }),
+        ),
+      ],
     );
   }
 
   Widget _buildBooksGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = UiUtils.getGridColumns(constraints.maxWidth);
+        // Determine number of columns based on orientation and size
+        final isLandscape = MediaQuery.of(Get.context!).orientation == Orientation.landscape;
+        final width = constraints.maxWidth;
+
+        // In landscape mode on phones, show more columns
+        final columns = isLandscape
+            ? UiUtils.getGridColumns(width) + 1 // Add one more column in landscape
+            : UiUtils.getGridColumns(width);
 
         return GridView.builder(
           padding: const EdgeInsets.all(16),
@@ -260,50 +167,68 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
+    // Determine if we're in landscape mode for a more compact empty state
+    final isLandscape = MediaQuery.of(Get.context!).orientation == Orientation.landscape;
+
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            "assets/images/gambar1.png",
-            width: 150,
-            height: 150,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            "No stories found!",
-            style: TextStyle(
-              fontFamily: "Baloo",
-              fontSize: 24,
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Smaller image in landscape
+            Image.asset(
+              "assets/images/luna_title.png",
+              width: isLandscape ? 100 : 150,
+              height: isLandscape ? 100 : 150,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: isLandscape ? 100 : 150,
+                  height: isLandscape ? 100 : 150,
+                  color: Colors.grey.shade200,
+                  child: const Icon(
+                    Icons.search_off,
+                    size: 64,
+                    color: AppColors.primary,
+                  ),
+                );
+              },
             ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            "Try a different search or category",
-            style: TextStyle(
-              fontFamily: "Nunito",
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => _controller.filterByCategory("All"),
-            icon: const Icon(Icons.refresh),
-            label: const Text("Show all books"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+            SizedBox(height: isLandscape ? 16 : 24),
+            const Text(
+              "No stories found!",
+              style: TextStyle(
+                fontFamily: "Baloo",
+                fontSize: 24,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: isLandscape ? 8 : 12),
+            const Text(
+              "Try a different search or category",
+              style: TextStyle(
+                fontFamily: "Nunito",
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: isLandscape ? 16 : 24),
+            ElevatedButton.icon(
+              onPressed: () => _controller.filterByCategory("All"),
+              icon: const Icon(Icons.refresh),
+              label: const Text("Show all books"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -313,21 +238,25 @@ class HomeScreen extends StatelessWidget {
 class _ResponsiveHeader extends StatelessWidget {
   final HomeController controller;
   final RxBool isMusicPlaying;
+  final bool useCompactMode; // For landscape orientation
 
   const _ResponsiveHeader({
     Key? key,
     required this.controller,
     required this.isMusicPlaying,
+    this.useCompactMode = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width to determine responsive behavior
-    final double screenWidth = MediaQuery.of(context).size.width;
-
     // Adaptive layout based on screen width
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: EdgeInsets.fromLTRB(
+          16,
+          useCompactMode ? 8 : 12,
+          16,
+          useCompactMode ? 4 : 0
+      ),
       child: LayoutBuilder(
           builder: (context, constraints) {
             // Calculate available width
@@ -339,10 +268,10 @@ class _ResponsiveHeader extends StatelessWidget {
 
             return Row(
               children: [
-                // App icon (always shown)
+                // App icon (always shown, but smaller in compact mode)
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: useCompactMode ? 40 : 48,
+                  height: useCompactMode ? 40 : 48,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
@@ -354,22 +283,22 @@ class _ResponsiveHeader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.auto_stories,
                     color: Colors.white,
-                    size: 28,
+                    size: useCompactMode ? 22 : 28,
                   ),
                 ),
 
                 // App title - if space permits
                 if (canShowTitle) ...[
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       "Storybook",
                       style: TextStyle(
                         fontFamily: "Baloo",
-                        fontSize: 24,
+                        fontSize: useCompactMode ? 20 : 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
@@ -390,7 +319,7 @@ class _ResponsiveHeader extends StatelessWidget {
                 const SizedBox(width: 8),
 
                 // Profile button - only show if space permits
-                if (canShowProfile) ...[
+                if (canShowProfile && !useCompactMode) ...[
                   CircleButton(
                     icon: Icons.person,
                     onPressed: () => UiUtils.showComingSoonMessage("Profile"),
