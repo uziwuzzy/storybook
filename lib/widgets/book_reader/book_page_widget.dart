@@ -80,7 +80,8 @@ class BookPageWidget extends StatelessWidget {
                   right: isTablet ? 40 : 24,
                 ),
                 child: Center(
-                  child: Scrollbar(
+                  child: RawScrollbar(
+                    thumbColor: Colors.white30,
                     controller: scrollController,
                     thickness: 4,
                     radius: const Radius.circular(8),
